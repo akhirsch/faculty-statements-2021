@@ -1,0 +1,124 @@
+#+TITLE: Outline for Research Statement
+#+AUTHOR: Andrew K. Hirsch
+#+OPTIONS: H:1 toc:nil
+#+DATE: September 16, 2021
+
+
+Core concept: My work considers the design and semantics of programming languages and logics with agents that communicate along trust lines
+
+* Intro
+** Modern software involves multiple agents
+*** Users
+*** Nodes in a distributed system
+*** mutually-distrusting components of a system (security /principals/)
+** Programming languages do not take these into account
+*** Languages do not support reasoning about trust and communication
+**** Objects and other module systems provide logical separation, but little-to-no security guarantees
+** Solution from logic
+*** Modality as "belief of an agent"
+*** Authorization logic: trust and communication
+** Modal Types
+*** Add information about what agents "own" types
+** My Work
+*** Authorization Logic
+I focus on making trust a first-class citizen in authorization logics
+- Belief Semantics
+- FLAFOL
+- Current work: Noninteference for Realistic ALs
+*** Information-Flow Control
+I focus on building general models of information flow, and thus tools for language designers
+- FLAFOL
+- Secure Effects
+- Secure ITrees
+- Logical-relations models for declassification
+*** Choreographies
+I introduced modal types for choreographies, combining choreographic (distributed/concurrent programming) and functional programming
+- Pirouette
+- Polymorphic \lambda Chor
+- Current work: Polymorphic Pirouette with Clients
+- Future Work: Connections with Authorization Logic
+* Authorization Logic
+** Basic idea of authorization logic
+- Beliefs of agents
+- If Alice trusts Bob, and Bob believes \varphi, then Alice believes \varphi
+** Methods of handling trust
+- Outside the system
+- As a formula (/discoverable/ trust)
+** Belief Semantics
+*** Goal: develop semantics of authorization logic for /proof-carrying/ authorization
+- Idea: request for access to a resource comes with a proof that access should be granted; principals keep track of what formulae they believe
+*** Model: keep sets of formulae for each principal, trust is superset
+*** Introduces FOCAL, the First-Order Constructive Authorization Logic which has discoverable trust
+*** Problem of accidental trust
+- If Alice knows more than Bob, she trusts Bob
+** FLAFOL
+*** Goal: Give a proof-theoretic account of /flow-limited/ authorization, which combines information-security and authorization policies
+*** Introduces the Flow-Limited Authorization First-Order Logic (FLAFOL)
+*** First proof of noninterference for logic with discoverable trust
+**** What is noninterference?
+**** Problem with noninterference and discoverable trust
+*** Problem: Strange semantics of implication
+- Needed for cut elimination
+** Current Work: Noninterference for realistic ALs
+*** FLAFOL/FOCAL rather stripped down
+- Equality
+- Common Belief
+- Squashed beliefs
+*** Goal: Add these elements to FOCAL, prove NI
+- Requires new proof theory
+  + Fitch-style system
+* Information-Flow Control
+** Confidentiality and integrity labels
+** FLAFOL
+- Uses IFC labels for information-security policies
+** Secure Effects
+*** Effects can leak information
+- Example
+*** Program-Counter Labels
+*** Giving semantics to PC labels via monads and type-and-effect system
+** Secure ITrees
+*** ITrees as a way of writing every trace at once
+*** ITree Equivalence (eqtt)
+*** Noninterference as a property of two traces
+*** Security as a new ITree equivalence
+** Logical-Relations Models for Declassification
+*** Declassification
+*** Logical-Relations Models
+*** Where Declassification
+*** What Declassification
+* Choreographies
+** Modalities as location
+- No longer mutually-distrusting
+** Pirouette
+- First functional /choreographic/ language
+- Write from a top-down point of view
+- /Project/ programs to each /endpoint/
+** Polymorphic \lambda Chor
+- Functional choreographic language with polymorphism
+- Including polymorphism /over locations/
+- Much simpler language that Pirouette
+** Polymorphic Pirouette
+- Add polymorphism to Pirouette
+- Include other FP constructs -- existential types, recursive types, etc.
+- Add /clients/ --- locations not necessarily controlled by the program author
+  * Controled locations can act as clients, for e.g., a test server
+* Effects
+** Linear Logic and Modalities
+** Strictness and laziness from modalities
+** Mixed strictness and laziness
+* Future Work
+** Choreographies and Authorization Logic
+*** Way of giving Curry-Howard interpretation to Authorization Logic
+**** Can be used to validate design choices
+** Semantics of Noninterference
+- Allows us to prove theorems about all IFC languages and auth. logics with noninterference
+*** Categorical
+*** Game-Theoretic
+** Algebraic effects and handlers in IFC
+*** Allow arbitrary (algebraic) effects in a single IFC language
+*** Allows study of effects in guaranteed-secure way
+** Efficient Compilation of Pirouette
+*** Current compilation requires a lot of synchronization
+*** Need to insert locks into the right places and use lockless in the right places
+** Dependently-Typed Choreographies
+*** Allows for verified distributed programs
