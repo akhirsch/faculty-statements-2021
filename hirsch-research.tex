@@ -166,42 +166,6 @@ In another, we extend Pirouette to include not only polymorphism, but the abilit
 \paragraph{Strictness and Laziness from Effects}
 
 
-\iffalse
-\textbf{My work focuses on the semantics and design of programming languages and logics that explicitly reason about trust and communication.}
-These logics allow us to reason about security policies, while the programming languages I design allow programmers to build correct-by-construction programs.
-By ensuring that programs are correct---and thus, secure---we save programmers from partaking in an error-prone manual debugging process.
-
-In order to achieve correctness-by-construction for communication and trust, we must explicitly represent the agents which perform the communication and trust.
-These agents may be nodes in a distributed system; that is, computers connected by a network which communicate with each other in order to perform a common task.
-Alternatively, they may be users who have provided data to the system, and who ``communicate'' whenever one's data is revealed to another.
-These sorts of possibly-mutually-distrusting agents are called \emph{principals} in security.
-
-We represent principals by using an idea from formal logic: \emph{modalities}.
-In logic, a modality allows us to express that a proposition is believed by some principal.
-In programming languages, a modality allows us to express that some data is owned by an principal.
-To represent communication, we change modalities.
-Thus, to reason about a security policy where Alice has a belief, she may communicate to Bob by transmitting that belief to him, allowing us to conclude that Bob believes the same thing.
-Trust, then, limits communication.
-By ensuring that communication only happens along trust lines, we enforce a basic security policy: \emph{noninterference}.
-
-Logics with modalities, trust, and communication are known as \emph{authorization logics}.
-Authorization logics allow us to reason about the consequences of security policies.
-My work in logic focuses on the challenge of making trust a first-class citizen.
-
-If we identify a principal with how their data should be treated, we can build languages with \emph{information-flow control}.
-Such languages allow us to annotate data with \emph{confidentiality} and \emph{integrity} policies, expressing who may learn the data and who may determine the data, respectively.
-My work on information-flow control focuses on building general metatheoretic tools which designers of such languages may apply to new languages.
-
-If we represent a principal more directly, however, we can build languages for message-passing concurrency and distributed computing.
-In particular, I introduced \emph{functional choreographic programming}, which allows us to tag data with a node in a distributed system which stores the data.
-Communication is then message-passing communication.
-This allows us to write deadlock-free-by-construction programs.
-
-Finally, modalities are useful even to represent things other than principals.
-In particular, they have found much use in reasoning about \emph{effectful code}, or code which performs actions other than examining its inputs and building its outputs.
-Not only does much of my work on information-flow control use this method to reason about effects, but I have shown how strict and lazy evaluation orders arise from combinations of modalities.
-\fi
-
 \bibliography{bibliography/main}
 \end{document}
 
