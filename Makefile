@@ -7,7 +7,7 @@ outlines: research_stmt_outline.pdf
 all: statements outlines
 
 research_stmt_outline.pdf: research_stmt_outline.org
-	pandoc -o research_stmt_outline.pdf research_stmt_outline.org
+	pandoc --pdf-engine=xelatex -o research_stmt_outline.pdf research_stmt_outline.org
 
 hirsch-research.pdf: hirsch-research.tex bibliography/main.bib
 	latexmk -pdf hirsch-research.tex
