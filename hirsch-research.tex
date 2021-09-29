@@ -75,95 +75,16 @@ In another line of work, I also use modalities to represent \textbf{computationa
 In particular, I have used modalities to show that \textbf{strict and lazy evaluation strategies arise from effect interactions.}
 
 \section*{Trust as a First-Class Citizen}
-\citet{Abadi06} introduced the idea of reasoning about access-control policies using a logic with modalities.
-He suggested that we use $p \mathrel{\textrm{says}} \varphi$ to represent the fact that the component (known in the security literature as a \emph{principal}) $p$ believes the formula $\varphi$ to be true.
-He then represented trust by saying that if $p$ \emph{speaks for} $q$, then if $p$ believes $\varphi$, we can assume that $q$ also believes $\varphi$.
-Abadi (and most of his successors) did not allow trust to appear as statements in the logic; instead, trust was imposed on the outside.
-However, practical implementations of his idea~\citep{SchneiderWS11,SirerDBRSWWS11} required that trust be treated like any other logical formula.
-
-My work in authorization logic gives theoretical grounding to this practical extension.
-In \textit{Belief Semantics of Authorization Logic}~\citet{HirschC13}, we introduced the First-Order Constructive Authorization Logic (FOCAL), a logic for reasoning about access control with first-class trust.
-We focused on building \emph{models} for this logic, which are mathematical structures we can use to give semantics to logics.
-While our focus was on building models that matched practical uses such as that by \citet{SirerDBRSWWS11}, we found that standard models of such logic failed to account for intention in trust.
-Thus, any principal~$p$ who happens to believe more things than a principal~$q$ trusts $q$, whether or not $p$ even knows that $q$ exists.
-In that paper, we ruled out such ``accidental trust'' by fiat, but left open for future work a more-satisfactory treatment of trust in model theory.
-
-In \textit{First-Order Logic for Flow-Limited Authorization}~\citep{HirschACAT20}, we introduced the Flow-Limited Authorization First-Order Logic.
-This logic combined information-security policies with access-control policies; like FOCAL, it had trust as a first-class citizen.
-However, unlike FOCAL, we proved \emph{noninterference}, the key correctness-by-construction theorem which states that beliefs of principals that $p$ does not trust does not affect $p$'s beliefs.
-First-class trust poses a fundamental challenge to this theorem: who $p$ does and does not trust can change during a proof.
-To see this, consider a proof that starts with the premise that either $p$ trusts $q$ or $p$ believes $\varphi$.
-If we perform case analysis on this premise, then we are allowed to assume that $p$ trusts $q$ in one branch, but not the other.
-Therefore, we must over-approximate trust in the noninterference theorem, leading to a less-precise result.
-
-Current work extends the work on FLAFOL to make the noninterference less precise and several aspects of the design more practical.
-Moreover, it allows reasoning about \emph{equality}, which requires more reasoning.
-After all, we now must know not only whether $p$ trusts $q$, but whether $r$ trusts $s$ when $p = r$ and $q = s$.
-
-\paragraph{Semantic Tools for Information-Security Policies}
-Information-security policies tell us how data should be treated in a program.
-For instance, we may choose to label some information as \textsf{Public} and other information \textsf{Private}.
-Then, \textsf{Private} information should not influence \textsf{Private} observations.
-\emph{Information-flow control} tries to enforce this version of \emph{noninterference}.
-A common technique for enforcing noninterference labels every type in a programming language with an information-security policy, and then using the type system to enforce noninterference.
-
-As mentioned, FLAFOL~\citep{HirschACAT20} combines reasoning about access-control policies with information-security policies.
-To do this, we refine the formula $p \mathrel{\textrm{says}} \varphi$ by adding an information-flow policy describing how $p$ wants their belief treated.
-We also make the notion of trust more specific: in order for $p$ to trust $q$, not only must $p$ believe what $q$ has to say, but $q$ must be willing to tell $p$.
-With this simple change, we were able to show that our one noninterference theorem enforced the information-security policies.
-
-In a program, using private information to compute a public output leaks that private information.
-Private information can also leak \emph{indirectly} via an effect.
-For instance, imagine a program which, if a private variable is zero, prints a string to the screen and otherwise does nothing.
-Anybody who can see the screen then knows whether the variable is zero.
-In order to counter this in a type system, standard practice adds a \emph{program-counter label} to the type system.
-This ensures that any effect which an adversary might see occurs without regards to private data.
-
-In \textit{Giving Semantics to Program-Counter Labels via Secure Effects}~\citep{HirschC21}, we look at the semantics of program-counter labels.
-In particular, we show that program-counter labels can be given semantics via type-and-effect systems and \emph{monads}, a common structure in the semantics of effects.
-Monads give semantics to effectful programs by finding equivalent \emph{pure} programs, with a new output type which gives access to effectful operations.
-We state and prove the \emph{noninterference half-off} theorem, which says that if you can prove noninterference for the pure part of your language, monadic semantics allows you to get noninterference for the effectful language.
-Moreover, we are able to show that under very general conditions, program-counter labels can be given semantics through this method.
-
-In \textit{Progress-Sensitive Security Semantics with ITrees}~\citep{SilverHHCZ22}, we extend the Interaction Trees (ITrees) library~\citep{XiaZHHMPZ20} to reason about information-security policies.
-Interaction trees are a Coq library for executable semantics of impure and recursive programs.
-The key reasoning facility of interaction trees is \emph{equivalence up-to taus}, which gives an equivalence on ITrees.
-Essentially equivalence up-to taus states that two programs are equivalent if they interact with the environment in exactly the same pattern, including provide equal outputs.
-We added two new relations to the ITrees library, representing when two ITrees are equivalent according to an adversary.
-In one relation, the adversary can tell when a program has gone into an infinite loop.
-However, most languages can only enforce noninterference against and adversary who cannot make such a determination.
-In order to accommodate those languages, we also include a weaker relation where the adversary considers an infinite loop equivalent to every other program.
-\akh{This title will almost certainly change in the next few weeks.}
-
-In \textit{Logical Relations for Higher-Order Where Declassification}~\citep{MenzHLG22}, we build models of languages with \emph{declassification}.
-Declassification allows \textsf{Private} data to sometimes influence \textsf{Public} data, but only in controlled circumstances.
-Thus, we enforce not noninterference, but more-complicated security guarantees.
-Mixing declassification with higher-order programming makes the guarantees even harder to provide.
-By using \emph{logical relations}---a common technique in the programming-languages literature---we can build better guarantees and proofs that our language enforces those guarantees.
-In current work, we are extending those results to cover new methods of declassification and new security guarantees.
-
-\paragraph{Deadlock-Free-By-Construction Higher-Order Programming}
-Choreographic programming~\citep{Montesi13} is a new programming paradigm for programs with message-passing concurrency.
-It allows programmers to write the entire program from one point-of-view rather than writing a single program for each thread of computation.
-Then, \emph{endpoint projection} allows a compiler to produce a program for every thread of computation.
-\emph{Deadlock-freedom-by-construction} guarantees that such programs never go wrong---their communication does not deadlock.
-However, choreographic programming has been explored only in simple imperative settings.
-
-In \textit{Pirouette: Higher-Order Typed Functional Choreographies}~\citep{HirschG22}, we introduce Pirouette, which extends choreographic programming to the functional setting.
-Moreover, we designed our language to allow messages from any single-threaded functional base language, and provide guarantees relative to the guarantees of that language.
-To support this, Pirouette has types of the form $\ell.\tau$, where $\ell$ is a \emph{location}, or a thread of computation.
-We allow information to be sent from one location to another using an Alice-and-Bob--style syntax.
-We then extend this with recursive functions, along with other functional programming features.
-Endpoint projection compiles this to one functional program for every location, using a functional language which contains send and receive functions.
-The correctness of endpoint projection, along with other properties of our language, is formalized in Coq.
-
-Current work extends this by allowing a user to write programs which operate over any location.
-This allows more code reuse, since library functions can be written once and then run on every location.
-In one piece of current work, we have a pared-down functional choreographic language which we extend with polymorphism, including polymorphism over locations.
-In another, we extend Pirouette to include not only polymorphism, but the ability to interact with arbitrary \emph{clients} from outside the choreographic system.
 
 
-\paragraph{Strictness and Laziness from Effects}
+
+\section*{Semantic Tools for Information-Security Policies}
+
+\section*{Deadlock-Free-By-Construction Higher-Order Programming}
+
+\section*{Strictness and Laziness from Effects}
+
+\section*{Future Work}
 
 
 \bibliography{bibliography/main}
