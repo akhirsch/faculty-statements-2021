@@ -2,8 +2,8 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[letterpaper, margin=1in, bottom=1in]{geometry}
-\usepackage[numbers,sort,square]{natbib}
+\usepackage[a4paper, top=0cm, margin=2cm, bottom=2cm]{geometry}
+\usepackage[numbers,sort&compress,square]{natbib}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
@@ -13,7 +13,7 @@
 \usepackage{mathtools}
 \usepackage{mathpartir}
 \usepackage[dvipsnames]{xcolor}
-\usepackage{latex-pl-syntax/pl-syntax}
+\usepackage{pl-syntax}
 \usepackage{xspace}
 \usepackage{suffix}
 \usepackage{turnstile}
@@ -51,7 +51,7 @@
 
 \maketitle
 
-\textbf{My work focuses on the semantics and design of programming languages and logics for writing and verifying decentralized software.}
+\textbf{My work~\citep{SilverHHCZ22,MenzHLG22,HirschG22,HirschC21,HirschACAT20,HirschT18,HirschC13} focuses on the semantics and design of programming languages and logics for writing and verifying decentralized software.}
 Thus, my work allows programmers to write and reason about programs with components that may be mutually-distrusting, represent different threads of computation, represent different nodes in a distributed system, or more.
 To do this, I treat trust and communication as explicit parts of the design process, rather than afterthoughts.
 I then keep to a key design principle: communication can only happen along trust lines.
@@ -71,21 +71,215 @@ In my work, I represent decentralized software components using \emph{modalities
 This allows me to bring decades of work on the semantics and proof theory of modal logic to bear on the problems of decentralized software.
 Moreover, modalities allow for an easy representation of communication: communication moves information from one modality (i.e., component) to another.
 
-In another line of work, I also use modalities to represent \textbf{computational effects}, which are ways that programs interact with their environment other than receiving inputs and producing outputs.
+In another line of work, I also use modalities to represent \emph{computational effects}, which are ways that programs interact with their environment other than receiving inputs and producing outputs.
 In particular, I have used modalities to show that \textbf{strict and lazy evaluation strategies arise from effect interactions.}
 
 \section*{Trust as a First-Class Citizen}
 
+Systems have certain resources that not every component should have access to.
+For instance, a university system may have printers in the engineering library that engineering students, but not liberal-arts students, should be able to print on (and vice-versa).
+Policies about what system components may access what resources are known as \emph{authorization} policies.
+Often, system designers put complex authorization policies into place in order to efficiently enforce simpler, but slower, policies.
+For instance, while checking a centralized list of engineering students every time someone tries to print would be slow, providing engineering-student accounts with tokens representing their status can decrease communication time.
+However, now one needs to prove that nobody who is not an engineering student gets print access in this token-checking regime.
 
+In order to reason about such policies and their consequences, we embed them in modal logics called \emph{authorization logics}.
+In authorization logics, modalities represent \emph{beliefs} of software components.
+Trust represents willingness to adopt beliefs: if Alice trusts Bob, and Bob believes a statement~$s$, then Alice also believes~$s$.
+In the earliest authorization logics~\citep{Abadi06}, trust was defined on the outside, and cannot change due to reasoning.
+However, when researchers used authorization logics in practical settings, they found that treating trust as just another formula was necessary to express the authorization policies they wanted~\citep{SchneiderWS11}.
 
-\section*{Semantic Tools for Information-Security Policies}
+\iffalse
+Practical uses of authorization logics almost always use a technique called \emph{proof-carrying authorization}~\citep{WhiteheadAN04,SirerDBRSWWS11,SkalkaRDKGDSF19}.
+This uses authorization logics not only to reason about policies but to enforce them: when a component requests access to a resource, they must supply an authorization-logic proof showing that they are allowed access.
+This implementation breaks the connection between systems and the mathematical models usually used to interpret authorization logics.
+These models assume that components get their beliefs by considering what must be true given observations of the world around them.
+However, proof-carrying authorization systems store components' beliefs in a data store.
+\fi
+
+In order to understand how systems that use these practical logics correspond to models of authorization logics, I developed FOCAL---an authorization logic with trust as a formula, similar to that found in the Nexus operating system~\citep{SchneiderWS11,SirerDBRSWWS11}---and built a \emph{belief} semantics for it~\citep{HirschC13}.
+In this model, each component is given a set of beliefs, and Alice trusts Bob whenever Alice believes fewer things than Bob.
+This leads a problem of ``accidental trust'' where Alice trusts Bob without knowing that she does.
+In order to rule this out, we only consider models where Alice knows she trusts Bob.
+This inspired later work in models for social-network privacy policies~\cite{PardoS17}, while the design of FOCAL influenced the design of a later authorization logic used in software-defined networks~\citep{SkalkaRDKGDSF19}.
+
+While FOCAL had a model theory closer to that of practical systems, we did not prove \emph{noninterference}, the main metatheoretic security property for authorization logics.
+Intuitively, noninterference says that if Alice does not trust Bob, then Bob's beliefs cannot influence Alice's beliefs.
+However, when trust is first-class, it is not so easy to say whether Alice trusts Bob.
+For instance, if we assume that Bob believes some statement~$s$, and we further assume that either Alice trusts Bob or Alice believes~$s$, then we can prove that Alice believes~$s$.
+In this proof, Bob's belief in~$s$ influences Alice's belief, even though Alice does not necessarily trust Bob.
+To solve this, we can instead consider whether it is possible for Alice to trust Bob, not only whether Alice \emph{does} trust Bob.
+When I designed FLAFOL~\cite{HirschACAT20}, which refined FOCAL with information-security policies, I adapted proof-theoretic techniques to do exactly this.
+Thus, FLAFOL is the \emph{first} logic with trust as a first-class citizen to have a proof of noninterference.
+
+While FLAFOL was a major step forward, it sacrificed other metatheoretic properties in order to make the proof of noninterference possible.
+In my current work, I am adapting techniques from modal type theory to regain those metatheoretic properties, while also increasing the precision of the technique.
+
+\section*{New Semantic Foundations for Language-Based Security}
+
+Language-based security strives to build programming languages which enforce security guarantees in any program written in those languages.
+Most commonly, they enforce information-security guarantees using \emph{information-flow control}; languages that implement information-flow control are called information-flow languages.
+In their simplest form, these languages divide data into secret data and public data, and then ensure that secret data cannot affect an adversaries observations.
+This property is known, yet again, as \emph{noninterference}, and it is closely related to noninterference in authorization logics.
+More complicated information-flow languages consider more than public and secret data.
+For instance, we might consider data from trusted and untrusted sources, or we might consider Alice's secrets as separate from Bob's secrets.
+
+When defining a new information-flow language, the current common practice is to hand-roll arguments for security and safety.
+Often, those hand-rolled arguments can be based on patterns that came before, but must be matched to the new domain manually.
+Once security is proved for the language, it may be implemented, in which case hand-rolled arguments are again used for ensuring that interactions with the environment do not violate the enforced policies.
+
+This pattern of hand-rolled arguments is necessary when working with new techniques in a new domain.
+For instance, much of the modern work on language-based security does not enforce noninterference itself, but instead enforces one of a range of \emph{declassification} policies.
+Declassification allows secret data to be revealed to an adversary in a controlled manner.
+For instance, a password checker needs to reveal that an incorrect password is incorrect to a user, even though that releases information about the---sensitive!---password to a possible attacker.
+Much of the work in declassification is in \emph{lower-order} languages, which do not support code reuse.
+In order to support code reuse, we use higher-order features like objects and first-class functions.
+However, proving declassification policies in languages with higher-order features is a significant challenge, since released data may itself contain code that releases more data.
+Some of my current work explores using \emph{logical relations}, a powerful technique from the programming-languages--semantics literature, to give declassification guarantees to higher-order languages~\citep{MenzHLG22}.
+
+While hand-rolled arguments are necessary for exploration, \textbf{my goal is to develop a toolbox abstracting out common arguments in the information-flow literature}.
+For instance, implementations of information-flow languages must interact with system resources, which have associated authorization policies.
+When the system attempts to enforce these properties, it can break the information-security properties the language tries to enforce.
+Consider a simple example from social networks: imagine that Alice only allows her friends to view her photos, and also only allows her friends to know who is on her friends list.
+Then, when Bob tries to view Alice's photo, if he is not on her friends list, he is denied access to the photo.
+This reveals something about the content of Alice's friends list to Bob, which he is not allowed to know.
+FLAFOL~\citep{HirschACAT20} combines information-flow policies with authorization logic to reason about this type of policy combination.
+Using proof-carrying authorization, systems can rely on FLAFOL's noninterference guarantee to know that authorization-policy enforcement does not break information-flow guarantees.
+While the current FLAFOL work does not explicitly show how to achieve this guarantee, I hope to expand in this direction in future work.
+
+While this helps us to preserve guarantees when interacting with system resources, it does not help with language-level guarantees.
+The biggest obstacles to noninterference tend to be \emph{effects}, which are ways that programs act that do not correspond to taking an input and producing an output.
+Printing to the screen, writing to memory, and throwing exceptions are all effects.
+Effects can leak information if they depend on secrets.
+For instance, a program which looks at a secret integer and, if it is zero, prints ``zero'' to the screen (and otherwise does nothing) leaks information about the input to an adversary who can see the screen.
+In order to protect against such effects, information-flow languages usually keep track of a \emph{program-counter label} which describes the secrecy of the context.
+Thus, when we print to the screen based on whether a secret integer is zero, we can see that because the program path depends on the value of a secret, we should not print to the screen.
+
+The programming-language semantics literature treats effects in a very different manner.
+Rather than keeping track of an extra label, we can give semantics to effectful programs by changing them to \emph{pure} programs which return a representation of their effects.
+For instance, we might return, along with the normal return value of the program, a list of outputs written to the screen.
+This technique is known as the \emph{monadic} semantics of effects.
+Unifying these two perspectives, I was able to show that program-counter labels can be given semantics using monadic semantics of effects~\citep{HirschC21}.
+As a result, I was able to prove the \emph{noninterference half-off} theorem, which allows programmers to prove their effectful language secure if they can use monadic semantics with a pure noninterfering language.
+Since pure language are usually relatively easy to show noninterference for, this can reduce a language designer's work considerably.
+
+These relatively-easy proofs are tedious, however.
+Moreover, in order to increase assurance as much as possible, we would like to \emph{verify} proofs of noninterference in proof assistants such as Coq~\cite{Coq04}.
+Sadly, verification of programming languages in general is very hard, since the most-natural representations of programs yield brittle and unwieldy proofs.
+Recent work introduced Interaction~Trees~(ITrees)~\citep{XiaZHHMPZ20}, which attempt to solve this problem by giving a runnable representation of programs in Coq, even when those programs might not terminate.
+ITrees work by representing programs as (possibly-infinite) trees of interactions with an environment.
+Then, monadic semantics can be used to provide that environment, allowing some interactions to disappear from the tree, replaced by their concrete counterpart.
+
+The key reasoning tool for ITrees is a bisimulation relation: two trees are bisimilar if they interact with the environment in exactly the same way.
+Recent work of mine modified this bisimulation relation to take into account an adversary's point of view: two programs are indistinguishable to an adversary if their interactions \emph{that the adversary can see} are exactly the same~\citep{SilverHHCZ22}.
+However, interactions that the adversary cannot see---which includes all secret inputs---may differ arbitrarily.
+Thus, a program is noninterfering if it is indistinguishable from itself: even if secret inputs differ arbitrarily, an adversary must not see any differences.
+We were then able to show that a large number of combinators preserve indistinguishability, allowing simple proofs of noninterference that do not require low-level reasoning about indistinguishability.
 
 \section*{Deadlock-Free-By-Construction Higher-Order Programming}
 
+Writing concurrent or distributed software requires not only choosing the right abstractions for writing single-threaded programs, but also choosing good abstractions for message passing.
+Currently, the common choice is to use a functional or object-oriented language with send and receive capabilities on top.
+Even with a normal typing discipline, this makes it easy to write programs that \emph{deadlock}; that is, they cannot proceed because the sends and recieves do not match up.
+This breaks Milner's influential, but informal, guarantee for type systems: ``well-typed programs cannot `go wrong'\hspace{.2em}''~\citep{Milner78}!
+
+One way forward is to use types that provide the guarantees we need.
+Session types~\citep{DeYoungCPT09,Wadler12} guarantee that programs never deadlock.
+However, they are very complicated, even compared to the complicated types used for information-flow control.
+Furthermore, session types usually only guarantee deadlock-freedom in communication between two threads.
+In order to handle three or more threads, we need to move to multiparty session types~\cite{ScalasY19,HondaYC16}, a significant increase in complexity.
+
+Choreographic programming~\citep{Montesi13} offers a promising way forward: instead of writing a program for each thread communicating through explicit send and receive commands, write a single program using an Alice-and-Bob--style notation for communication.
+Then, we can compile a single-threaded program for each thread.
+Programs are deadlock-free by construction, since sends and receives are always matched up by the compiler.
+
+In order for choreographic programming to be usable for large software projects, it has to offer the possibility of code reuse via higher-order programming.
+I introduced Pirouette~\citep{HirschG22}, the first higher-order choreographic programming language.
+Pirouette mixes functional programming with choreographic programming, using modalities to represent on which thread data was located.
+Because the base of Pirouette is a functional programming language, code reuse through function arguments is standard.
+Furthermore, Pirouette's guarantees---including deadlock-freedom by construction---are verified in Coq.
+
+While Pirouette offers code reuse via higher-order functions, it does not allow polymorphism.
+Polymorphism allows code to be used on data of any type, and is important for practical functional programming.
+As a consequence, Pirouette does not allow code to run on different threads.
+In current work, I am exploring a choreographic language with both features.
+
+However, these features still lock a program into a closed world: every location is part of the same choreographic program.
+In other current work, I am extending Pirouette with \emph{clients}: outside processes that can communicate with processes in the choreographic program.
+To see why this is important: imagine writing a web server, backed by a database and a test server.
+The web server needs to be able to communicate with arbitrary clients, which may not be written in Pirouette, as well as with the database.
+Moreover, the test server needs to be able to connect with the webserver as a clients as well as connect with the database as the web server.
+This also inspires another feature we are investigating: allowing threads that are part of the Pirouette program act as clients.
+
 \section*{Strictness and Laziness from Effects}
+
+When a function is called on an argument that is not a value, two things could happen.
+Most languages are \emph{strict}, meaning they evaluate the argument first and then run the function on the resulting value.
+However, some languages are \emph{lazy}, meaning they start running the function and evaluate the argument on demand.
+Strict programs are much easier to reason about, leading to their near-universal adoption; however, laziness allows for speedups in some situations and allows programs to naturally operate on infinite data structures.
+This choice, and the consequences of it, are some of the oldest topics in computer science, having interested luminaries such as Alonzo Church~\citep{ChurchR36}.
+By adopting a new perspective on this old problem, I was able to both shed new light on the choice itself and discover insights into modern problems~\citep{HirschT18}.
+
+I argue that strictness and laziness arise not when we think about function calls, but instead when we think about \emph{program composition}.
+Moreover, it only comes when we try to compose programs with two effects: (possible) nontermination and (possible) \emph{nonlinearity}.
+Nontermination can be given monadic semantics, since programs which may not terminate may not produce a value.
+Nonlinearity is a stranger beast: a program uses its input \emph{nonlinearly} if it uses it any number of times other than exactly one.
+Nonlinearity cannot be given monadic semantics, but instead must be given semantics using a \emph{comonad}, which changes an \emph{input} of a program rather than the output.
+
+To see that you need both effects, let us imagine that we work with a linear language.
+Then every program must use each of its inputs exactly once and so every input will be evaluated.
+Thus, if any input does not terminate, the entire program does not terminate.
+Dually, imagine that we work with a terminating language.
+Then, whether or not a program uses its inputs, those inputs will terminate, so the entire expression will always be able to provide a result.
+However, if you have both effects, then a program may not use an input which does not terminate.
+This leads to the choice: if you evaluate the input, then the entire program does not terminate, but if you do not then the program can provide a result.
+
+With this insight, we can turn the choice between strictness and laziness into a choice of interactions between a \emph{monadic} effect and a \emph{comonadic} effect.
+There are two ways that a monad and comonad can interact without more structure: \emph{layering} the monad over the comonad, or vice versa.
+Applying those constructions in this situation, we discover that they treat the interactions of the effects like a race.
+Layering the monad over the comonad lets the monad ``go first:'' we first consider whether an input fails to terminate and, if it does, the entire program fails to terminate.
+Thus, it acts like a strict language.
+Layering the comonad over the monad lets the comonad ``go first:'' we first consider whether a program fails to use an input and, if it does, then it does not look at whether its input terminates.
+Thus, it acts like a lazy language.
+
+However, most languages do not use only strict or lazy behaviors.
+Instead, they default to one behavior, but allow a programmer to strategically choose the other strategy.
+In current work, I am exploring the semantics of such languages.
+To do this, we consider programs which may produce outputs either strictly or lazily, and may consume inputs strictly or lazily.
+Composing strict outputs with strict inputs (or lazy outputs with lazy inputs) works exactly as in the strict-only or lazy-only case.
+However, to switch from one to the other requires an extra mathematical object called a \emph{distributive law}.
 
 \section*{Future Work}
 
+Going into the future, there is plenty of exciting work to be done in each of these streams.
+The security guarantees for authorization logics can be made more precise.
+A formal connection between ITrees and secure effects will allow us to build a theory of secure handlers for ITrees, making security reasoning a first-class citizen of the ITrees library.
+Exploring distributed data structures will make choreography compilation more practical, leading to a real-world language.
+And finally, applying the semantics of strict and lazy programs from effects to \emph{effect systems} will allow compilers to reason about lazy programs more easily.
+
+I am \emph{very} excited about the gains to be made from combining these areas using their shared foundations in modal logic.
+I have already started on this project: FLAFOL combines information-flow control and authorization logic, while secure effects combine information-flow control with monadic effects.
+These combinations continue to be very promising, as I have already mentioned.
+
+The typing rule for Pirouette's combined send-and-receive construct is very similar to the rule for communication in FOCAL.
+However, FOCAL requires \emph{trust} for communication, whereas Pirouette assumes that every thread can talk to every other thread.
+This is not fundamental in concurrency however: we could require that two threads share a channel before they communicate.
+This leads to a connection between trust from authorization logic and channels in concurrency theory.
+I plan to use this to turn Pirouette into a model of authorization logic with first-class trust that does not suffer from accidental trust.
+
+Combining this idea with the ideas from FLAFOL will allow us to build information-flow choreographic languages.
+This gives a foundational way to combine information-flow control and message-passing concurrency.
+Since concurrency usually causes a jump in complexity in information-flow languages, this could be a significant improvement.
+
+I also plan to think about how choreographic programming interacts with monadic effects.
+Intuitively, choreographic programs incur \emph{local} effects---which only one thread can see---and \emph{global} effects, which every thread can see.
+Projection then tells us that global effects can be split into local effects.
+I plan to use this to build a choreographic language that also allows shared-memory concurrency.
+Here, each thread gets its own memory, and every thread can access the shared memory; projection of the global effect associates to each program their own reads and writes to global state.
+
+While I am very excited about these future ideas, I am sure that other application areas will pop up as well.
+I find that by talking across the theoretical/applied divide, I have been able to find inspiring areas full of interesting and important problems.
+I expect to continue applying ideas from logic, type theory, category theory, and topology to problems from security, systems, and more.
 
 \bibliography{bibliography/main}
 \end{document}
@@ -93,4 +287,5 @@ In particular, I have used modalities to show that \textbf{strict and lazy evalu
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: t
+%%% eval: (setenv "TEXINPUTS" ".::$TEXMF/tex/::./latex-pl-syntax/")
 %%% End:
