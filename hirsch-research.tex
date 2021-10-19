@@ -58,13 +58,13 @@ I abide by a key design principle: communication can only happen along trust lin
 This allows us to prove that programs and proofs are \emph{correct by construction}: communication never leaks secrets, nor does it cause errors such as deadlock.
 
 My research in this space can be divided into three lines.
-First, I have designed logics with \textbf{trust as a first-class citizen} to state and reason about security policies.
-Treating trust as something that can be manipulated in the policies themselves allows us to reason more-realistic policies, but makes the metatheory much more difficult to develop.
-Second, I have developed \textbf{new semantic foundations for language-based security}, which provides a toolbox for \emph{designers} of such languages.
+First, I have developed \textbf{new semantic foundations for language-based security}, which provides a toolbox for \emph{designers} of such languages.
 Language designers often have to prove theorems---such as \emph{noninterference}, the main security theorem for information-security policies---over and over again.
 By taking advantage of semantic techniques, we can prove such theorems once, and then apply them to a new language by noting what language features it has and does not have.
+Second, I have designed logics with \textbf{trust as a first-class citizen} to state and reason about security policies.
+Treating trust as something that can be manipulated in the policies themselves allows us to reason about more-realistic policies, but makes the metatheory much more difficult to develop.
 Finally, I am working on \textbf{functional deadlock-free-by-construction concurrent programming}.
-This allows a programmer to program in a familiar functional style and extract several programs---for example, on program for each node in a distributed system.
+This allows a programmer to program in a familiar functional style and extract several programs---for example, one program for each node in a distributed system.
 These programs provably communicate according to a shared protocol.
 
 Not only is my work unified by motivations involving decentralization, communication, and trust, it also shares a foundational technical core: \emph{modal logic}.
@@ -74,40 +74,11 @@ This allows me to bring decades of work on the semantics and proof theory of mod
 In the following three sections, I explain each of these lines of research in more detail.
 In particular, I describe the research I have done in each line and how it has addressed important gaps in the research literature.
 
-\section*{Trust as a First-Class Citizen in Logic}
-
-Systems have certain resources that not every component should have access to.
-Policies about what system components may access what resources are known as \emph{authorization} policies.
-For instance, imagine a key-card access system for an apartment complex where users may fill any combination of three roles: residents, who may access their homes; staff, who may access the building they work in; and security auditors, who may see access logs.
-Access logs map key-card--id numbers to building accesses, while security auditors are not allowed to know what key-card--id numbers are associated to what names.
-An auditor, Alice, may see a card access both the building that her friend Bob works in and the building he lives in; she may then believe that number belongs to Bob.
-Based on this, Alice may take certain actions; for instance, she may ignore when that key-card id accesses more buildings that she believes Bob should have access to.
-If another guard, say Dave, trusts Alice, he will be willing to believe Alice when she tells him that the key-card id belongs to Bob.
-
-Previous work used modalities to reason about \emph{beliefs} such as Alice's.
-Combining modal logics with trust resulted in logics called \emph{authorization logics}.
-Authorization logics have been successfully used not only to reason about authorization policies~\citep{Abadi06}, but also to enforce such policies~\cite{SchneiderWS11,SirerDBRSWWS11}.
-
-While enforcing authorization policies using logic directly correctly ensures security, doing so also breaks the assumptions used when arguing for the correctness of such logics.
-These arguments rely on \emph{models} of the logic, which interpret statements in the logic as being true about some mathematical structure.
-Because the systems now used logical formulae directly to represent beliefs, systems were no longer models for those logics, since models did not contain logical formulae.
-In order to bridge this disconnect, I developed FOCAL---an authorization logic similar to that found in the Nexus operating system~\citep{SchneiderWS11,SirerDBRSWWS11}---and built a \emph{belief} semantics for it which did contain these formulae~\citep{HirschC13}.
-Belief semantics inspired later work in models for social-network privacy policies~\cite{PardoS17}, while the design of FOCAL influenced the design of a later authorization logic used in software-defined networks~\citep{SkalkaRDKGDSF19}.
-
-While FOCAL provided correctness arguments for practical authorization logics, no practical authorization logic was known to enjoy \emph{noninterference}, the main security theorem of authorization logics.
-Noninterference says that a principal's beliefs do not affect what another principal believes, as long as the second principal does not trust the first.
-However, knowing who trusts whom when trust can be manipulated by logical connectives is highly nontrivial.
-When I designed FLAFOL~\citep{HirschACAT20}, which refined FOCAL with information-security policies, I adopted proof-theoretic techniques to state and prove noninterference even in the face of these difficulties.
-
-While FLAFOL was a major step forward, it sacrificed other metatheoretic properties in order to make the proof of noninterference possible.
-In my current work, I am adapting techniques from modal type theory to regain those metatheoretic properties, while also increasing the precision of the technique.
-
 \section*{New Semantic Foundations for Language-Based Security}
 
 Language-based security strives to build programming languages which enforce security guarantees in any program written in those languages.
 Most commonly, they enforce information-security guarantees using \emph{information-flow control}; languages that implement information-flow control are called information-flow languages.
-In their simplest form, these languages divide data into secret data and public data, and then ensure that secret data cannot affect an adversary's observations.
-This property is known, yet again, as \emph{noninterference}, and it is closely related to noninterference in authorization logics.
+In their simplest form, these languages divide data into secret data and public data and then ensure \emph{noninterference}, which requires that secret data cannot affect an adversary's observations.
 
 While the history of information-flow control is long and complicated, almost all work in the area has focused on building languages for new settings.
 In contrast, \textbf{my goal is to develop a semantic toolbox for the designers of information-flow languages}.
@@ -122,7 +93,7 @@ Authorization-policy enforcement corresponding to FLAFOL proofs is guaranteed to
 Second, I provided a semantics of \emph{program-counter labels}, a common aspect of information-flow--control type systems, via a \emph{monadic} semantics of \emph{effects}~\citep{HirschC21}.
 Noninterference arguments for languages that use program-counter labels are famously complicated.
 My semantics enabled me to prove a theorem called \emph{noninterference half-off}.
-This guarantee allows a language designer to use simpler proofs of noninterference for \emph{pure} languages---which do not need program-counter labels---by using the monadic semantics to reason about their effects instead.
+This guarantee allows a language designer to use simpler proofs of noninterference for \emph{pure} languages---which do not need program-counter labels---by using monadic semantics to reason about effects.
 
 % It feels weird and unethical to use "I" here---like I'm writing the students out of the story. I think that's standard practice, though?
 Third, I provided a Coq library based on \emph{Interaction Trees} for implementing and reasoning about information-flow programming languages~\citep{SilverHHCZ22}.
@@ -138,12 +109,37 @@ Instead, more-subtle guarantees limit the influence private data can have on pub
 By understanding what those more-subtle guarantees are and how they can be proven, I am stretching the limits of indistinguishability models.
 Thus, while building models of particular languages does not result in theorems that can be applied to new languages, I plan to use the lessons learned from this work to build better general models.
 
+\section*{Trust as a First-Class Citizen in Logic}
+
+Systems have certain resources that not every component should have access to.
+Policies about what system components may access what resources are known as \emph{authorization} policies.
+For instance, imagine a key-card access system for an apartment complex where users may fill any combination of three roles: residents, who may access their homes; staff, who may access the building they work in; and security auditors, who may see access logs.
+Access logs map key-card--id numbers to building accesses, while security auditors are not allowed to know what key-card--id numbers are associated to what names.
+An auditor, Alice, may see a card access both the building that her friend Bob works in and the building he lives in; she may then believe that number belongs to Bob.
+Based on this, Alice may take certain actions; for instance, she may ignore when that key-card id accesses buildings that she believes Bob should have access to.
+If another guard, say Dave, trusts Alice, he will be willing to believe Alice when she tells him that the key-card id belongs to Bob.
+
+Previous work used modalities to reason about \emph{beliefs} such as Alice's.
+Combining modal logics with trust resulted in logics called \emph{authorization logics}.
+Authorization logics have successfully been used not only to reason about authorization policies~\citep{Abadi06}, but also to enforce such policies~\cite{SchneiderWS11,SirerDBRSWWS11}.
+
+While directly using logic to enforce authorization policies ensures security, doing so also breaks the assumptions used in arguments for the correctness of such logics.
+These arguments rely on \emph{models} of the logic, which interpret statements in the logic as being true about some mathematical structure.
+Because the systems use logical formulae directly to represent beliefs, systems no longer fit these models, since the models do not contain logical formulae.
+In order to bridge this disconnect, I developed FOCAL---an authorization logic similar to that found in the Nexus operating system~\citep{SchneiderWS11,SirerDBRSWWS11}---and built a \emph{belief} semantics for it also uses formulae to represent beliefs~\citep{HirschC13}.
+Belief semantics inspired later work in models for social-network privacy policies~\cite{PardoS17}, while the design of FOCAL influenced the design of a later authorization logic used in software-defined networks~\citep{SkalkaRDKGDSF19}.
+
+While FOCAL provided correctness arguments for practical authorization logics, no practical authorization logic was known to enjoy \emph{noninterference}, which is also the name of the main security theorem for authorization logics.
+Noninterference says that a principal's beliefs do not affect what another principal believes, as long as the second principal does not trust the first.
+However, knowing who trusts whom when trust can be manipulated by logical connectives is highly nontrivial.
+When I designed FLAFOL~\citep{HirschACAT20}, which refined FOCAL with information-security policies, I adopted proof-theoretic techniques to state and prove noninterference even in the face of these difficulties.
+
 \section*{Deadlock-Free-By-Construction Higher-Order Programming}
 
 So far we have focused on security aspects of decentralized programming.
 However, decentralization also requires writing concurrent software, allowing code to be distributed between different processes or even computers.
 I am particularly interested concurrent programs where processes communicate via messages, as happens at every level of concurrency, from distributed systems to modern processors.
-A major goal of previous works on message-passing concurrency is proving \emph{deadlock-freedom}---that is, that the different processes in the code never find themselves waiting on each other.
+A major goal of previous works on message-passing concurrency was proving \emph{deadlock-freedom}---that is, that the different processes in the code never find themselves waiting on each other.
 
 When writing concurrent software, care must be taken when choosing a programming model as well as a concurrency model.
 Usually, software engineers prefer higher-order languages such as functional or object-oriented languages, since higher-order abstractions allow more and better-behaved code reuse.
@@ -160,7 +156,8 @@ Here, modalities represent which process holds a value.
 \emph{Endpoint projection} translates a Pirouette program into a program for each process expressed in a standard concurrent $\lambda$ calculus.
 That is, each process's program is expressed in a functional programming language with \textsf{send} and \textsf{receive} primitives.
 While programs in this language can easily deadlock, projected programs are deadlock free.
-This guarantee, along with all of Pirouette's other guarantees, is formally proven in Coq.
+% Maybe delete the next two lines?
+This guarantee is formally proven in Coq, as are all of Pirouette's guarantees.
 The corresponding increase in confidence of these guarantees is especially important given that major theorems in concurrency theory have recently been disproved~\citep{Cruz-FilipeMP19}.
 
 \section*{Future Work}
@@ -176,14 +173,15 @@ Moreover, I plan on extending Pirouette in several directions, such as by adding
 By adding such practically-minded extensions, and working with more-applied collaborators, these languages can solve important problems throughout computing.
 
 Using abstract models of languages, we can develop libraries of theorems which can be applied to new concrete language designs.
-So far, my work in this direction has focused on information-flow control, but this is not fundamental: I have built models describing issues in programming-language design which do not focus on security at all~\citep{HirschT18}.
+So far, my work in this direction has focused on information-flow control, but this is not fundamental.
+In fact, I have built abstract models focusing on issues in programming-language design which do not address security at all~\citep{HirschT18}.
 Going forward, building such models of authorization logics and choreographic programs could bring many of the same benefits to those domains that I discussed for information-flow control.
 I'm particularly interested in understanding how the language of messages can affect the properties of a choreographic language.
 By parameterizing Pirouette's design on the message language, I have already begun to build general models; future models will be more abstract, allowing them to be applied outside Pirouette.
 
 Finally, verification techniques give a toolbox for programmers who want to prove their programs secure and correct.
-Coq libraries such as the interaction-trees library, are a promising method for applying abstract models to verification.
-This style also holds promise for authorization policies: Coq libraries and metaprogramming facilities could make proving that systems enforce authorization policies using authorization logics realistic.
+Coq libraries such as the interaction-trees library are a promising method for applying abstract models to verification.
+This style also holds promise for authorization policies: Coq libraries and metaprogramming facilities could allow realistic methods of providing authorization-logic proofs that systems enforce security policies.
 Language design also has a significant role to play here.
 In particular, I plan to use the similarities between authorization logics and choreographic programming to build a tool for verifying concurrent programs.
 
