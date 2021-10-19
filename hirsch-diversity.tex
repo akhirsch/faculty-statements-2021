@@ -1,0 +1,101 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[a4paper, top=0cm, margin=2cm, bottom=2cm]{geometry}
+\usepackage[numbers,sort&compress,square]{natbib}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{bbm}
+\usepackage{bbold}
+\usepackage{stmaryrd}
+\usepackage{mathtools}
+\usepackage{mathpartir}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{pl-syntax}
+\usepackage{xspace}
+\usepackage{suffix}
+\usepackage{turnstile}
+\usepackage{multicol}
+
+\usepackage[hidelinks]{hyperref}
+
+
+% Notes
+\newcommand{\uncertain}[1]{{\color{red} #1}\xspace}
+\newcommand{\newcommenter}[3]{%
+  \newcommand{#1}[1]{%
+    \textcolor{#2}{\small\textsf{[{#3}: {##1}]}}%
+  }%
+}
+\definecolor{darkgreen}{rgb}{0,0.7,0}
+\newcommenter{\akh}{purple}{AKH}
+
+% AMSTHM Setup
+\newtheorem{thm}{Theorem}
+\newtheorem{lem}{Lemma}
+\newtheorem{cor}{Corollary}
+\newtheorem{conj}{Conjecture}
+\newtheorem{inv}{Invariant}
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}
+
+\author{Andrew K. Hirsch}
+\title{Outreach and Diversity Statement}
+\date{}
+
+\bibliographystyle{plainnat}
+
+\begin{document}
+\maketitle
+
+I was lucky enough to grow up in a very diverse neighborhood: the two largest ethnic groups were Hispanic and Vietnamese, but there were a good number of white and black residents as well.
+This gave me an appreciation for the cultural wealth created by diversity.
+I want to do what I can to bring that to the places where I work and live for the rest of my life as well.
+Moreover, growing up gay in Texas in the 90s and 2000s, I struggled with my sexuality for a good portion of my life.
+While I am now happily out and visible, that experience gave me a lot of empathy with people trying to figure out their identity.
+
+These experiences spurred me to work on outreach, especially outreach which increases diversity, my entire career.
+My focus has been in three areas: outreach in elementary schools, science communication, and conference organization.
+In every case, my eye has been on how my work affects diversity.
+
+Scientists often neglect elementary-school outreach, despite the incredible impact it can have.
+Many students never experience computer science at all until high school or even college.
+When they do, it is like their experience with math: boring, stodgy, and rote.
+This especially harms girls and minority students, who are pressured by those around them not to like ``nerdy'' subjects.
+By giving students fun and creative experiences with computing and math, we can inoculate them from believing that our subjects are only accessible to white men.
+I started working in elementary schools my second year of my Ph.D. through Cornell's Center for Community Engagement.
+I began spending two afternoons a week teaching the principles of programming to students in grades 2-5 after school.
+After a year, that program was sadly not renewed.
+However, I continued working in elementary schools through Cornell's math department.
+Every year, a group of us would go to classrooms for grades 2-6 and teach a math class designed to be fun and creative.
+Our lesson plans included crafts and discovery, and were often looked forward to by both teachers and students for the entire year.
+I plan to bring elementary-school outreach to my next job, and continue providing students with a fun and refreshing experience with computing and math.
+
+Elementary outreach helps by inoculating students against the stereotypes of computing and math as stodgy and rote, but public attitude continues to bombard students with these stereotypes.
+This means that students come into computer-science classrooms with misinformed ideas about what computer scientists and programmers do which can repel women and minority students.
+Moreover, public misunderstanding of computing can lead to bad public policy which affects all of us, and affects minorities disproportionately.
+To combat this, I volunteered this year as a science communicator with Electronic Frontiers Georgia and the Electronic Frontiers Foundation at the Electronic Frontiers Forums held yearly as part of Dragoncon, a large convention held every year in Atlanta, Georgia.
+As part of this volunteering role, I explained both basic computer-security concepts and the software-engineering issues in the Oracle v. Google case to a general audience.
+I am already preparing for my role next year volunteering not only with EFF, but also with the science-communication team at Dragoncon.
+
+While working with elementary schools and science communicators can help change how computer science is perceived by students in our classrooms, it does not directly impact the research community.
+However, by disrupting the ``normal'' conference process, COVID-19 has put our community in a crossroads regarding how we communicate our research findings.
+While the programming-languages community has long been on the forefront of conference design, we have recently been forced, along with every other research community, into a radical experiment with virtual conferences.
+This has been a mixed blessing: many more people can attend virtual conferences from much more diverse backgrounds; however, engagement at the conferences they can attend is much lower.
+
+As we go back to in-person conferences, we want to keep the diversity while also increasing engagement.
+In many different forums, members of our community have defended many hypotheses about how best to do so, ranging from ``stay completely virtual'' to ``go back to 100\% in-person'' with every form of hybrid in-between.
+I have also floated hypotheses, joining a group of students at every pre-faculty stage in a researchers career to write a post on the SIGPLAN blog discussing options.
+However, I was alarmed to find how little data was being collected allowing these hypotheses to be tested.
+After bringing this situation to the attention of the SIGPLAN executive committee, I have been asked to organize and chair an ad-hoc committee exploring how virtualization decisions impact diversity and engagement.
+That committee is now beginning the work of organizing the data that we have and collecting more information as we go into the future.
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% eval: (setenv "TEXINPUTS" ".::$TEXMF/tex/::./latex-pl-syntax/")
+%%% End:
