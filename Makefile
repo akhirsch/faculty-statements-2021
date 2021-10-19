@@ -2,7 +2,7 @@ export TEXINPUTS = .::$TEXMF/tex/::latex-pl-syntax
 
 .PHONY: clean all main cleanall outlines statements
 main: statements
-statements: hirsch-research.pdf
+statements: hirsch-research.pdf hirsch-teaching.pdf hirsch-diversity.pdf
 outlines: research_stmt_outline.pdf
 all: statements outlines
 
@@ -11,6 +11,12 @@ research_stmt_outline.pdf: research_stmt_outline.org
 
 hirsch-research.pdf: hirsch-research.tex bibliography/main.bib
 	latexmk -pdf hirsch-research.tex
+
+hirsch-teaching.pdf: hirsch-teaching.tex
+	latexmk -pdf hirsch-teaching.tex
+
+hirsch-diversity.pdf: hirsch-diversity.tex
+	latexmk -pdf hirsch-diversity.tex
 
 ALLCLEANABLES := $(shell find . \( -name '*.aux'\
                              -o -name '\#*\#'\
