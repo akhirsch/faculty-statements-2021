@@ -13,7 +13,7 @@
 \usepackage{mathtools}
 \usepackage{mathpartir}
 \usepackage[dvipsnames]{xcolor}
-\usepackage{pl-syntax}
+% \usepackage{pl-syntax}
 \usepackage{xspace}
 \usepackage{suffix}
 \usepackage{turnstile}
@@ -47,18 +47,22 @@
 
 \bibliographystyle{plainnat}
 
+\frenchspacing
+\usepackage{newtxtext}
+\usepackage[T1]{fontenc}
+
 \begin{document}
 
 \maketitle
 
 \textbf{My work focuses on the semantics and design of programming languages for writing decentralized software~\citep{SilverHHCZ22,MenzHLG22,HirschG22,HirschC21,HirschACAT20,HirschT18,HirschC13}.}
-Thus, my work allows programmers to write and reason about programs with components that may be mutually distrusting, may represent different threads of computation, may represent different nodes in a distributed system, or more.
+Thus, my work allows programmers to write and reason about programs with components which may be mutually distrusting, may represent different threads of computation, may represent different nodes in a distributed system, or more.
 My general approach is to include trust and communication as explicit primitives in the languages that I design.
 I abide by a key design principle: communication should only happen along trust lines.
-This allows us to prove that programs and proofs are \emph{correct by construction}: communication never leaks secrets, nor does it cause errors such as deadlock.
+This principle allows us to design languages where programs and proofs are \emph{correct by construction}: communication never leaks secrets, nor does it cause errors such as deadlock.
 
 My research in this space can be divided into three lines.
-First, I have developed \textbf{new semantic foundations for language-based security}, which provides a toolbox for \emph{designers} of such languages.
+First, I have developed \textbf{new semantic foundations for language-based security}, which provide a toolbox for \emph{designers} of such languages.
 Language designers often have to prove theorems---such as \emph{noninterference}, the main security theorem for information-security policies---over and over again.
 By taking advantage of semantic techniques, we can prove such theorems once, and then apply them to a new language simply by noting what language features it has and does not have.
 Second, I have designed logics with \textbf{trust as a first-class citizen} to state and reason about security policies.
@@ -78,15 +82,16 @@ In particular, I describe the research I have done in each line and how it has a
 
 Language-based security strives to build programming languages which enforce security guarantees in any program written in those languages.
 Most commonly, they enforce information-security guarantees using \emph{information-flow control}; languages that implement information-flow control are called information-flow languages.
-In their simplest form, these languages divide data into secret data and public data and then ensure \emph{noninterference}, which states that secret data cannot affect an adversary's observations.
+In their simplest form, these languages divide data into secret data and public data using a \emph{modal} type system in which modalities of truth are interpreted as information-security policies.
+The languages then use these type systems to ensure \emph{noninterference}, which states that secret data cannot affect an adversary's observations.
 
-While the history of information-flow control is long and complicated, almost all work in the area has focused on building languages for new settings.
+Almost all previous work on information-flow languages has focused on building languages for new settings.
 In contrast, \textbf{my goal is to develop a semantic toolbox for the designers of information-flow languages}.
-In particular, I have built models of information-flow languages and exploited those models to prove general theorems that can apply to future languages.
+In particular, I have built models of information-flow languages and exploited those models to prove general theorems which can apply to future languages.
 This can make noninterference---along with other information-security guarantees---easier to prove in future works.
 
 I have begun to build that toolbox in three ways.
-First, I designed FLAFOL, an authorization logic which includes information-flow labels representing information-security policies on beliefs~\citep{HirschACAT20}.
+First, I designed FLAFOL, an authorization logic that inclues information-security policies~\citep{HirschACAT20}.
 Since authorization decisions are based on data which might be subject to information-security policies, care must be taken to not leak information about such data when enforcing authorization policies.
 Authorization-policy enforcement corresponding to FLAFOL proofs is guaranteed to comply with these information-security policies, with no additional proof burden on the implementer.
 
@@ -100,9 +105,10 @@ In particular, they need only prove noninterference for simpler \emph{pure} lang
 Third, I provided a Coq library based on \emph{Interaction Trees} for implementing and reasoning about information-flow programming languages~\citep{SilverHHCZ22}.
 Interaction trees represent possibly-nonterminating programs in Coq as trees of interactions with their environment, with a branch for each possible response from the environment.
 The original interaction-trees library reasoned about interaction trees using \emph{bisimilarity}, which states that programs interact with their environment in the same way.
-We added a \emph{indistinguishability} relation, which tells us when an adversary cannot see a difference between programs via their interactions with their environments.
-This allowed us to instantiate the indistinguishability model of information flow~\citep{SabelfeldS99}, and thus use the interaction-trees library to build simple proofs of noninterference.
-In particular, we were able to show that a compiler preserved noninterference; formal proofs of secure compilation are an active area of current research.
+I added an \emph{indistinguishability} relation, which tells us when an adversary cannot see a difference between programs via their interactions with their environments.
+This allowed me to instantiate the indistinguishability model of information flow~\citep{SabelfeldS99}, and thus use the interaction-trees library to build simple proofs of noninterference.
+In particular, I was able to show that a compiler preserved noninterference.
+Notably, formal proofs of secure compilation are an active area of current research~\citep{AbateBGHPT19}.
 
 In current work, I am working on building indistinguishability models of particular languages which combine functional programming with \emph{declassification} using logical relations~\citep{MenzHLG22}.
 Declassification allows secret data to influence public data in certain cases; thus, noninterference is no longer an appropriate security guarantee.
@@ -115,8 +121,8 @@ Thus, while building models of particular languages does not result in theorems 
 Systems have certain resources that not every component should have access to.
 Policies about what system components may access what resources are known as \emph{authorization} policies.
 For instance, imagine a key-card access system for an apartment complex where users may fill any combination of three roles: residents, who may access their homes; staff, who may access the building they work in; and security auditors, who may see access logs.
-Access logs map key-card--id numbers to building accesses, while security auditors are not allowed to know what key-card--id numbers are associated to what names.
-An auditor, Alice, may see a card access both the building that her friend Bob works in and the building he lives in; she may then believe that number belongs to Bob.
+Access logs map key-card--id numbers to building accesses, while security auditors are not allowed to know which key-card--id numbers are associated with which names.
+An auditor, Alice, may see a card access both the building that her friend Bob works in and the building he lives in causing her to believe that the number belongs to Bob.
 Based on this, Alice may take certain actions; for instance, she may ignore when that key-card id accesses buildings that she believes Bob should have access to.
 If another guard, say Dave, trusts Alice, he will be willing to believe Alice when she tells him that the key-card id belongs to Bob.
 
@@ -159,8 +165,10 @@ Despite this, unverified implementations of higher-order choreographic programmi
 I solved this problem by designing Pirouette, the first functional choreographic language~\citep{HirschG22}.
 Pirouette's design is parameterized over a single-process language; Pirouette messages are values in this language.
 Moreover, I showed how we can lift a type system for such a single-process language to a modal type system for Pirouette.
-Here, modalities represent which process holds a value.
-\emph{Endpoint projection} translates a Pirouette program into a program for each process expressed in a standard concurrent $\lambda$ calculus.
+Here, modalities of truth represent a process holding a value or performing a computation.
+Thus, modal logic forms an essential organizational backbone for Pirouette.
+
+\emph{Endpoint projection} translates a Pirouette program into a program for each process expressed in a standard concurrent $\lambda$~calculus.
 That is, each process's program is expressed in a functional programming language with \textsf{send} and \textsf{receive} primitives.
 While programs in this language can easily deadlock, projected programs are deadlock free.
 % Maybe delete the next two lines?
@@ -175,22 +183,23 @@ I plan to continue this work for a long time, lifting functional-programming fea
 
 \section*{Future Work}
 
-Going into the future, I will continue not only to develop these threads of research on decentralized, secure programming separately, but also to combine them using their shared modal foundations.
-This development will include the design of concrete languages, of abstract models, and of verification techniques.
-Not only do these styles of research each pose their own challenges and rewards, but each also inspires more development in the others.
+I believe that programming languages and logics with strong guarantees---such as deadlock-freedom and noninterference---will serve an indispensible role in the future of decentralized computing.
+However, not every situation calls for the same langauge.
+As we explore new domains and learn from the past, our languages will have to evolve.
+Thus, we must deeply understand how our languages deliver their guarantees.
+Such an understanding requires not only continuing the threads of research I described above, but also using their shared modal foundations to combine them.
+Moreover, I will design concrete languages, abstract models, and verification techinques.
+Each of these styles contributes directly to this understanding and inspires more developments in the others.
 
 Concrete languages allow us to explore the design space of languages and logics while also holding the possibility of impact via adoption.
 Going forward, I plan to continue to build new logics and programming languages with strong guarantees.
 For instance, I am currently working on building and proving secure an authorization logic which contains the logical features necessary to state practical security policies.
 Moreover, I plan on extending Pirouette in several directions, such as by adding the ability to interact with \emph{client} processes which are not controlled by the program author.
-% By adding such practically-minded extensions, and working with more-applied collaborators, these languages can solve important problems throughout computing.
 
 Using abstract models of languages, we can develop libraries of theorems which can be applied to new concrete language designs.
 So far, my work in this direction has focused on information-flow control, but this is not fundamental.
 In fact, I have built abstract models focusing on issues in programming-language design which do not address security at all~\citep{HirschT18}.
 Going forward, I plan to ease the design of new authorization logics and choreographic languages by building abstract models of these languages as well, just as I have for information-flow languages.
-% I'm particularly interested in understanding how the language of messages can affect the properties of a choreographic language.
-% By parameterizing Pirouette's design on the message language, I have already begun to build general models; future models will be more abstract, allowing them to be applied outside Pirouette.
 
 Finally, verification techniques give a toolbox for programmers who want to prove their programs secure and correct.
 Coq libraries such as the interaction-trees library are a promising method for applying abstract models to verification.
